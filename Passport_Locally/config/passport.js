@@ -4,12 +4,14 @@ const bodyParser=require('body-parser');
 const LocalStrategy=require('passport-local').Strategy;
 const {mongoose}=require("../DB/conn");
 const {User}=require("../models/Users");
+var cors=require('cors');
 
 var app=express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     encoded:true
 }));
+app.use(cors());
 app.use(passport.initialize());
 app.use(passport.session())
 
@@ -18,37 +20,31 @@ passport.serializeUser((user,done)=>{
     done(null,user);
 });
 passport.deserializeUser((user,done)=>{
-    console.log("deserializer");
-    done(null,user);
+    // console.log("deserializer");
+    // done(null,user);
 });
-passport.use('local',new LocalStrategy((username,password,done)=>{
-    User.findOne({"email":username},(err,user)=>{
-       if(err){
-           console.log("errror");
-           return done(err)}
+passport.use('local',new LocalStrategy({
+    usernameField:'email',
+    passwordField:'password',
+    passReqToCallback:true
+},(req,email,password,done)=>{
+    console.log(email);
+    User.findOne({email}).then((user)=>{
        if(!user){
            console.log("not found");
-           return done(false)}
+           return done(null,false)}
        if(user){
            console.log("user Loacal :"+user);
-           return done(user)
+           return done(null,user)
        }
+    }).catch(()=>{
+        console.log('Error');
     });
-    /*User.findOne({"email":username}).then((user)=>{
-        console.log(username,password);
-        //console.log(user);
-        if(!user){
-            console.log("inside if")
-            return done(null,false);
-        }
-        return done(null,user);
-    },(err)=>{return done(null,false)})*/
+
 }));
-app.post('/passUser',passport.authenticate('local',(req, res, err) => {
-    if(err) {
-        console.log(err);
-    }
-    res.json({message:"Success"});
+app.post('/passUser',passport.authenticate('local',{
+    successRedirect:"/",
+    failureRedirect:"/err"
 }));
 
 
@@ -56,7 +52,7 @@ app.post('/passUser',passport.authenticate('local',(req, res, err) => {
 //     console.log('sucess');
 //   res.json({message:"Success"});
 // }));
-app.get('/suc',(req,res)=>{
+app.get('/',(req,res)=>{
     res.json({message:"Success"});
 });
 app.get('/err',(req,res)=>{
@@ -87,7 +83,8 @@ app.get('/loginUser',(req,res)=>{
         res.send(err);
     });
 });
-app.listen(6666,()=>{
+
+app.listen(3004,()=>{
     console.log('connected');
 });
 

@@ -35,12 +35,13 @@ export default class Login extends Component{
         event.preventDefault();
         let logUser=this.state;
         console.log(logUser);
-        debugger;
+        //debugger;
 
 
         axios.post(LOGIN_PASSPORT,{
-            username: this.state.email,
-            password: this.state.password
+            email: this.state.email,
+            password: this.state.password,
+            mode:'cors'
         }).then((res)=>{
             console.log("In Then "+res.data);
             // if(res.data.message!=='Failed'){
@@ -50,6 +51,7 @@ export default class Login extends Component{
                 let token=jwt.sign(logUser,'Rashika'); //object,privatekey
                 console.log("Token :",token);
                 localStorage.setItem('user',token);
+
                 ReactDOM.render(<div id="loguser">{logUser.email}<Success/></div>,document.getElementById('root'));
             }
             else{
@@ -60,52 +62,7 @@ export default class Login extends Component{
         });
 
 
-        // axios.get('http://localhost:3000/err')
-        //     .then((res)=>{
-        //         console.log(res);
-        //         // if(res.data.message!=='Failed'){
-        //         if(res.data.message==='Sucess'){
-        //
-        //             console.log("Res success : ",res);
-        //             let token=jwt.sign(logUser,'Rashika'); //object,privatekey
-        //             console.log("Token :",token);
-        //             localStorage.setItem('user',token);
-        //             ReactDOM.render(<div id="loguser">{logUser.email}<Success/></div>,document.getElementById('root'));
-        //         }
-        //         else{
-        //             console.log("Failed to Login",res);
-        //         }
-        //     }).catch((err)=>{
-        //     console.log(err);
-        // });
 
-        // axios({
-        //     method: 'POST',
-        //     url: LOGIN_PASSPORT,
-        //     data: {
-        //         email: this.state.email,
-        //         password: this.state.password
-        //     }
-        //          , responseType: 'application/json',
-        //     crossDomain : true,
-        //     withCredentials: true
-        // }).then((res)=>{
-        //         console.log("In Then "+res.data);
-        //    // if(res.data.message!=='Failed'){
-        //         if(res.data.message==='Success'){
-        //
-        //         console.log("Res success : ",res);
-        //         let token=jwt.sign(logUser,'Rashika'); //object,privatekey
-        //         console.log("Token :",token);
-        //         localStorage.setItem('user',token);
-        //         ReactDOM.render(<div id="loguser">{logUser.email}<Success/></div>,document.getElementById('root'));
-        //     }
-        //     else{
-        //         console.log("Failed to Login",res);
-        //     }
-        // }).catch((err)=>{
-        //     console.log(err);
-        // });
     }
     render(){
         return(
@@ -119,7 +76,7 @@ export default class Login extends Component{
                               <input type="text" className="inputtext" placeholder="Email" required autoFocus onChange={this.emailHandle.bind(this)} value={this.state.email}/>
                               <input type="text" className="inputpwd" placeholder="Password" required autoFocus onChange={this.pwdHandle.bind(this)} value={this.state.password}/>
                               <button className="btn btn-lg btn-primary btn-block" type="button" onClick={this.loginHandler.bind(this)}>Sign in</button>
-                              <label className="checkbox" pull-left>
+                              <label className="checkbox" >
                                   <input type="checkbox" value="remember-me"/>
                                       Remember me
                               </label>
